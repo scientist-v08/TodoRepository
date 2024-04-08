@@ -3,24 +3,26 @@
 </div>
 <div class="container">
   <div class="row">
-    @for (item of todoItems; track $index) {
-      <div class="col-md-4 mt-2 mb-2">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>{{item.title}}</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <p>{{item.description}}</p>
-          </mat-card-content>
-          <mat-card-actions>
-            <button
-              class="btn btn-primary btn-sm"
-              type="button"
-              (click)="completeOrInComplete(item)"
-            >{{item.completed ? 'Completed' : 'In-complete'}}</button>
-          </mat-card-actions>
-        </mat-card>
-      </div>
-    }
+    <ng-container *ngIf="todoItems$ | async as todoItems">
+      @for (item of todoItems.allTodo; track $index) {
+        <div class="col-md-4 mt-2 mb-2">
+          <mat-card>
+            <mat-card-header>
+              <mat-card-title>{{item.title}}</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p>{{item.description}}</p>
+            </mat-card-content>
+            <mat-card-actions>
+              <button
+                class="btn btn-primary btn-sm"
+                type="button"
+                (click)="completeOrInComplete(item)"
+              >{{item.completed ? 'Completed' : 'In-complete'}}</button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+      }
+    </ng-container>
   </div>
 </div>
