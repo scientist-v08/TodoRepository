@@ -6,30 +6,32 @@
     <button (click)="addTodo()" class="btn btn-warning" type="button">Add Todo</button>
   </div>
   <div class="row">
-    @for (item of todoItems; track $index) {
-      <div class="col-md-4 mt-2 mb-2">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>{{item.title}}</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <p>{{item.description}}</p>
-          </mat-card-content>
-          <mat-card-actions>
-            <button
-              class="btn btn-primary btn-sm"
-              type="button"
-              (click)="completeOrInComplete(item)"
-            >{{item.completed ? 'Completed' : 'In-complete'}}</button>&nbsp;&nbsp;
-            <button
-              class="btn btn-danger btn-sm"
-              type="button"
-              (click)="deleteTodo(item.id)"
-            >Delete Todo</button>&nbsp;&nbsp;
-            <button class="btn btn-custom btn-sm" (click)="editTodo(item.id)">Edit Todo</button>
-          </mat-card-actions>
-        </mat-card>
-      </div>
-    }
+    <ng-container *ngIf="todoItems$ | async as todoItems">
+      @for (item of todoItems.allTodo; track $index) {
+        <div class="col-md-4 mt-2 mb-2">
+          <mat-card>
+            <mat-card-header>
+              <mat-card-title>{{item.title}}</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p>{{item.description}}</p>
+            </mat-card-content>
+            <mat-card-actions>
+              <button
+                class="btn btn-primary btn-sm"
+                type="button"
+                (click)="completeOrInComplete(item)"
+              >{{item.completed ? 'Completed' : 'In-complete'}}</button>&nbsp;&nbsp;
+              <button
+                class="btn btn-danger btn-sm"
+                type="button"
+                (click)="deleteTodo(item.id)"
+              >Delete Todo</button>&nbsp;&nbsp;
+              <button class="btn btn-custom btn-sm" (click)="editTodo(item.id)">Edit Todo</button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+      }
+    </ng-container>
   </div>
 </div>

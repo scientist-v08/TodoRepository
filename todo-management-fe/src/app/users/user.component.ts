@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, inject } from "@angular/core";
 import { Todo, TodosInterface } from "../shared/types/todos.interface";
-import { Subject, takeUntil } from "rxjs";
+import { Observable, Subject, takeUntil } from "rxjs";
 import { TodoService } from "../shared/services/todo.service";
 import { MatCardModule } from "@angular/material/card";
 import { CommonModule } from "@angular/common";
@@ -13,7 +13,7 @@ import { CommonModule } from "@angular/common";
 })
 export default class UserComponent implements OnInit,OnDestroy{
 
-  todoItems:Todo[]=[];
+  todoItems$ = new Observable<TodosInterface>;
   private unsubscribe$ = new Subject<void>();
   private todoService = inject(TodoService);
 
@@ -27,12 +27,7 @@ export default class UserComponent implements OnInit,OnDestroy{
   }
 
   getAllTodos(): void{
-    this.todoService.getAllTodos()
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe({
-        next: (res:TodosInterface)=>this.todoItems=res.allTodo,
-        error: ()=>console.log("Error")
-      })
+    this.todoItems$ = this.todoService.getAllTodos();
   }
 
   completeOrInComplete(data:Todo):void{
