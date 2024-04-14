@@ -1,42 +1,55 @@
-import { Component, OnDestroy, OnInit, inject } from "@angular/core";
-import { MenuItem } from "../../types/menu-item.interface";
+import { Component, OnChanges, OnDestroy, OnInit, SimpleChanges, inject, input } from "@angular/core";
+import { MenuItem, MenuItemInterface } from "../../types/menu-item.interface";
 import { MenuItemsService } from "../../services/menuitem.service";
-import { Subject, takeUntil } from "rxjs";
-import { RoleService } from "../../services/role.service";
-import { Router } from "@angular/router";
+import { Subscription } from "rxjs";
+import { LogoutService } from "../../services/logout.service";
 
 @Component({
   selector:'todo-top-bar',
   templateUrl:'./top-bar.component.html'
 })
-export class TopbarComponent implements OnInit,OnDestroy{
+export class TopbarComponent implements OnInit,OnChanges,OnDestroy{
 
-  unsubscribe$ = new Subject<void>();
-  items:MenuItem[]=[];
+  shouldGetItems = input.required<boolean>();
+  unsubscribe$ : Subscription | null = null;
+  items$ :MenuItem[]=[];
   private menuItems = inject(MenuItemsService);
-  private roles = inject(RoleService);
-  private router = inject(Router);
+  private loggingOut = inject(LogoutService);
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if(changes['shouldGetItems'].currentValue===true){
+      this.getItems();
+    }
+    else if(changes['shouldGetItems'].currentValue===false){
+      setTimeout(()=>{
+        this.items$=[]
+      },500)
+    }
+  }
 
   ngOnInit(): void {
-    this.menuItems.items
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe({
-        next: (res:MenuItem[]) => this.items=res
-      })
+    if(localStorage.getItem("getMenu")==="true"){
+      this.getItems();
+    }
+    else{
+      this.items$=[]
+    }
   }
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    if(this.unsubscribe$ !== null){
+      this.unsubscribe$.unsubscribe();
+    }
+  }
+
+  private getItems():void{
+    this.unsubscribe$=this.menuItems.getMenuItems()
+        .subscribe((res:MenuItemInterface) => this.items$=res.menuItems)
   }
 
   logout():void{
-    localStorage.removeItem("token");
-    this.roles.setAdmin(false);
-    this.roles.setUser(false);
-    this.items=[];
-    this.menuItems.setMenuItems([]);
-    this.router.navigateByUrl("");
+    this.items$=[];
+    this.loggingOut.logout();
   }
 
 }

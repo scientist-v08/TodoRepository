@@ -1,23 +1,28 @@
 import { Injectable, inject } from "@angular/core";
 import { environment } from "../../../environments/environment.development";
 import { HttpClient } from "@angular/common/http";
-import { MenuItem, MenuItemInterface } from "../types/menu-item.interface";
-import { Observable, Subject } from "rxjs";
+import { MenuItemInterface } from "../types/menu-item.interface";
+import { BehaviorSubject, Observable } from "rxjs";
 
 @Injectable()
 export class MenuItemsService{
 
   private url:string = environment.URL;
-  items = new Subject<MenuItem[]>();
+  private items = new BehaviorSubject<boolean>(false);
   private http = inject(HttpClient);
+  getItem = this.items.asObservable();
 
   public getMenuItems() : Observable<MenuItemInterface>{
     const Url = this.url + "user/items";
     return this.http.get<MenuItemInterface>(Url);
   }
 
-  public setMenuItems(menuItems:MenuItem[]):void{
-    this.items.next(menuItems);
+  public setItem(bo:boolean):void{
+    this.items.next(bo);
+  }
+
+  public completeMenuItems():void{
+    this.items.complete();
   }
 
 }

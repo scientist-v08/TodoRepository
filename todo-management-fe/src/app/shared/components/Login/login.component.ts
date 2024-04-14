@@ -59,7 +59,8 @@ export class LoginComponent{
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (res:MenuItemInterface) => {
-          this.menuItems.setMenuItems(res.menuItems);
+          localStorage.setItem("getMenu","true")
+          this.menuItems.setItem(true);
           res.roleIDs.forEach(element => {
             if(element===2) {
               this.role.setAdmin(true);
